@@ -50,6 +50,12 @@ function Line(text, index) {
     lines.push(this);
   }
   
+  this.setText = function(_text) {
+    this.textnode.textContent = _text;
+  }
+  this.getText = function() {
+    return this.textnode.textContent;
+  }
   this.getNextLine = function() {
     return lines[this.getIndex() + 1];
   }
@@ -64,7 +70,7 @@ function Line(text, index) {
     lines.splice(this.getIndex(), 1);
   }
   this.getLength = function() {
-    return this.element.textContent.length;
+    return this.getText().length;
   }
   this.getCaretPos = function() {
     return window.getSelection().anchorOffset;
@@ -93,7 +99,11 @@ function Line(text, index) {
           let line = new Line('', self.getIndex() + 1);
           setSelect(line.textnode, 0);
         } else {
-          console.log('ok')
+          let text = self.getText();
+          let caret = self.getCaretPos();
+          self.setText(text.substring(0,caret));
+          let line = new Line( text.substring(caret) , self.getIndex() + 1);
+          setSelect(line.textnode, 0);
         }
         e.preventDefault();
         return false;
