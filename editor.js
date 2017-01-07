@@ -40,38 +40,47 @@ function Line(text, index) {
   this.contentelement = document.createElement('div');
   this.contentelement.classList.add('linecontent');
   this.element.appendChild(this.contentelement);
-  this.contentelement.innerHTML = text || '';
-  if(index !== undefined) {
-    
+  this.textnode = document.createTextNode(text || '')
+  this.contentelement.appendChild(this.textnode);
+  if(index !== undefined && lines[index]) {
+    editor.insertBefore(this.element, lines[index].element);
+    lines.splice(index, 0, this);
   } else {
     editor.appendChild(this.element);
     lines.push(this);
-    this.index = lines.length - 1;
   }
   
   this.getNextLine = function() {
-    return lines[lines.indexOf(this) + 1];
+    return lines[this.getIndex() + 1];
   }
   this.getPreviousLine = function() {
-    return lines[lines.indexOf(this) - 1];
+    return lines[this.getIndex() - 1];
+  }
+  this.getIndex = function() {
+    return lines.indexOf(this);
   }
   this.remove = function() {
     editor.removeChild(this.element);
-    lines.splice(this.index, 1);
+    lines.splice(this.getIndex(), 1);
   }
   this.getLength = function() {
     return this.element.textContent.length;
   }
+  this.getCaretPos = function() {
+    return window.getSelection().anchorOffset;
+  }
   
   var self = this;
+  
   this.element.addEventListener('keydown', function(e) {
     console.log(e)
     switch (e.code) {
       case 'Backspace': {
-        if(self.element.textContent.length === 0) {
+        // this logic should be different for selections, esp. multiline
+        if(self.getLength() === 0) {
           let prev = self.getPreviousLine();
           if(!prev) return false;
-          setSelect(prev.contentelement, prev.getLength());
+          setSelect(prev.textnode, prev.getLength());
           self.remove();
           e.preventDefault();
           return false;
@@ -79,13 +88,14 @@ function Line(text, index) {
           return true;
         }
       }
-      case 'ArrowUp': {
-        e.preventDefault();
-        if(e.shiftKey) {
-          // change selection
+      case 'Enter': {
+        if(self.getCaretPos() == self.getLength()) {
+          let line = new Line('', self.getIndex() + 1);
+          setSelect(line.textnode, 0);
         } else {
-          // if not top line, move cursor
+          console.log('ok')
         }
+        e.preventDefault();
         return false;
       }
     }

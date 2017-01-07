@@ -66,9 +66,12 @@ body {
   counter-increment: lines; 
   content: counters(lines, "");
 }
-.line:hover .linecontent {
+.linecontent {
   flex: 1 0 auto;
   margin-bottom: auto;
+  min-height: 1em;
+}
+.line:hover .linecontent {
   background: rgba(100,100,100,.3);
 }
 .line:last-child {
