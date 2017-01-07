@@ -70,6 +70,7 @@ body {
   flex: 1 1 auto;
   margin-bottom: auto;
   min-height: 1em;
+  word-break: break-all;
 }
 .line:hover .linecontent {
   background: rgba(100,100,100,.3);
