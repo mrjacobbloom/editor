@@ -5,14 +5,26 @@ document.querySelector('#cogbutton').addEventListener('click', function() {
 
 var lines = [];
 
+function getTextElement(contentelement) {
+  if(contentelement.children.length != 1) {
+    let text = contentelement.textContent;
+    while (contentelement.firstChild) {
+      contentelement.removeChild(contentelement.firstChild);
+    }
+    let textnode = document.createTextNode(text);
+    contentelement.appendChild(textnode);
+    return textnode;
+  } else {
+    return contentelement.firstChild;
+  }
+}
+
 function setSelect(elem1, index1, elem2, index2) {
   var range = document.createRange();
   var sel = window.getSelection();
-  while(elem1.nodeType != 3) elem1 = elem1.firstChild;
-  range.setStart(elem1, index1);
+  range.setStart(getTextElement(elem1), index1);
   if(elem2) {
-    while(elem2.nodeType != 3) elem1 = elem2.firstChild;
-    range.setEnd(elem2, index2);
+    range.setEnd(getTextElement(elem2), index2);
   } else {
     range.collapse();
   }
@@ -40,8 +52,7 @@ function Line(text, index) {
   this.contentelement = document.createElement('div');
   this.contentelement.classList.add('linecontent');
   this.element.appendChild(this.contentelement);
-  this.textnode = document.createTextNode(text || '')
-  this.contentelement.appendChild(this.textnode);
+  this.contentelement.appendChild(document.createTextNode(text || ''));
   if(index !== undefined && lines[index]) {
     editor.insertBefore(this.element, lines[index].element);
     lines.splice(index, 0, this);
@@ -51,10 +62,10 @@ function Line(text, index) {
   }
   
   this.setText = function(_text) {
-    this.textnode.textContent = _text;
+    this.contentelement.textContent = _text;
   }
   this.getText = function() {
-    return this.textnode.textContent;
+    return this.contentelement.textContent;
   }
   this.getNextLine = function() {
     return lines[this.getIndex() + 1];
@@ -89,7 +100,7 @@ function Line(text, index) {
             e.preventDefault();
             return false;
           }
-          setSelect(prev.textnode, prev.getLength());
+          setSelect(prev.contentelement, prev.getLength());
           self.remove();
           e.preventDefault();
           return false;
@@ -100,13 +111,13 @@ function Line(text, index) {
       case 'Enter': {
         if(self.getCaretPos() == self.getLength()) {
           let line = new Line('', self.getIndex() + 1);
-          setSelect(line.textnode, 0);
+          setSelect(line.contentelement, 0);
         } else {
           let text = self.getText();
           let caret = self.getCaretPos();
           self.setText(text.substring(0,caret));
           let line = new Line( text.substring(caret) , self.getIndex() + 1);
-          setSelect(line.textnode, 0);
+          setSelect(line.contentelement, 0);
         }
         e.preventDefault();
         return false;
