@@ -1,0 +1,76 @@
+body {
+  display: flex;
+  flex-direction: column;
+  background: #000;
+}
+#heading {
+  flex: 0 0 auto;
+  padding: 20px 0;
+}
+#heading #settings {
+  display: inline-block;
+  float: right;
+  max-height: 20px;
+}
+#heading #settingspanel {
+  border: 1px solid #ddd;
+  padding: 10px;
+  z-index: 4;
+  position: relative;
+  background: #333;
+  color: #ddd;
+  font-family: sans-serif;
+  font-weight: lighter;
+  display: none;
+}
+#heading #settingspanel.show {
+  display: block;
+}
+#heading #cogbutton {
+  color: ddd;
+  font-size: 20px;
+  cursor: default;
+  text-align: right;
+}
+#heading h1 {
+  color: ddd;
+  font-family: sans-serif;
+  font-weight: lighter;
+  padding: 0;
+  margin: 0;
+  line-height: 50%;
+}
+#editor {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  background: #333;
+  color: #ddd;
+  font-family: monospace;
+  border: 1px solid #ddd;
+  padding: 10px;
+  counter-reset: lines;
+}
+.line {
+  outline: none;
+  flex: 0 0 auto;
+  display: flex;
+}
+.line::before {
+  flex: 0 0 auto;
+  text-align: right;
+  padding-right: 10px;
+  border-right: 1px solid gray;
+  margin-right: 10px;
+  color: gray;
+  counter-increment: lines; 
+  content: counters(lines, "");
+}
+.line:hover .linecontent {
+  flex: 1 0 auto;
+  margin-bottom: auto;
+  background: rgba(100,100,100,.3);
+}
+.line:last-child {
+  flex: 1 0 auto;
+}
