@@ -3,23 +3,25 @@ document.querySelector('#cogbutton').addEventListener('click', function() {
 });
 // also on blur, or on document.body when target isn't in the settingspanel
 
-function setSelect(inp, s, e) {
-  e = e || s;
-  if (inp.createTextRange) {
-    var r = inp.createTextRange();
-    r.collapse(true);
-    r.moveEnd('character', e);
-    r.moveStart('character', s);
-    r.select();
-  } else if(inp.setSelectionRange) {
-    inp.focus();
-    inp.setSelectionRange(s, e);
+var lines = [];
+
+function setSelect(elem1, index1, elem2, index2) {
+  var range = document.createRange();
+  var sel = window.getSelection();
+  while(elem1.nodeType != 3) elem1 = elem1.firstChild;
+  range.setStart(elem1, index1);
+  if(elem2) {
+    while(elem2.nodeType != 3) elem1 = elem2.firstChild;
+    range.setEnd(elem2, index2);
+  } else {
+    range.collapse();
   }
+  sel.removeAllRanges();
+  sel.addRange(range);
 }
-function getParentLine(node) {;
+/*function getParentLine(node) {;
   while(true) {
     if(node == document.body || !node.parentElement) return null;
-    console.log(node)
     if(node.matches && node.matches('.line')) break;
     node = node.parentElement;
   }
@@ -28,7 +30,7 @@ function getParentLine(node) {;
 function getCurrentLine() {
   var selection = window.getSelection();
   return getParentLine(selection.focusNode);
-}
+}*/
 
 var editor = document.querySelector('#editor');
 function Line(text, index) {
@@ -39,19 +41,39 @@ function Line(text, index) {
   this.contentelement.classList.add('linecontent');
   this.element.appendChild(this.contentelement);
   this.contentelement.innerHTML = text || '';
-  if(index) {
+  if(index !== undefined) {
     
   } else {
     editor.appendChild(this.element);
+    lines.push(this);
+    this.index = lines.length - 1;
   }
   
+  this.getNextLine = function() {
+    return lines[lines.indexOf(this) + 1];
+  }
+  this.getPreviousLine = function() {
+    return lines[lines.indexOf(this) - 1];
+  }
+  this.remove = function() {
+    editor.removeChild(this.element);
+    lines.splice(this.index, 1);
+  }
+  this.getLength = function() {
+    return this.element.textContent.length;
+  }
+  
+  var self = this;
   this.element.addEventListener('keydown', function(e) {
     console.log(e)
     switch (e.code) {
       case 'Backspace': {
-        var line = getCurrentLine();
-        if(line.textContent.length === 0) {
-          editor.removeChild(line);
+        if(self.element.textContent.length === 0) {
+          let prev = self.getPreviousLine();
+          if(!prev) return false;
+          setSelect(prev.contentelement, prev.getLength());
+          self.remove();
+          e.preventDefault();
           return false;
         } else {
           return true;
