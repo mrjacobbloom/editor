@@ -67,7 +67,7 @@ body {
   content: counters(lines, "");
 }
 .linecontent {
-  flex: 1 0 auto;
+  flex: 1 1 auto;
   margin-bottom: auto;
   min-height: 1em;
 }
