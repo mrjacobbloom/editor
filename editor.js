@@ -85,7 +85,10 @@ function Line(text, index) {
         // this logic should be different for selections, esp. multiline
         if(self.getLength() === 0) {
           let prev = self.getPreviousLine();
-          if(!prev) return false;
+          if(!prev) {
+            e.preventDefault();
+            return false;
+          }
           setSelect(prev.textnode, prev.getLength());
           self.remove();
           e.preventDefault();
