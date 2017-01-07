@@ -94,13 +94,15 @@ function Line(text, index) {
     switch (e.code) {
       case 'Backspace': {
         // this logic should be different for selections, esp. multiline
-        if(self.getLength() === 0) {
+        if(self.getCaretPos() === 0) {
           let prev = self.getPreviousLine();
           if(!prev) {
             e.preventDefault();
             return false;
           }
-          setSelect(prev.contentelement, prev.getLength());
+          let oldprevlength = prev.getLength();
+          prev.setText(prev.getText() + self.getText());
+          setSelect(prev.contentelement, oldprevlength);
           self.remove();
           e.preventDefault();
           return false;
