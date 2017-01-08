@@ -114,6 +114,36 @@ function Line(text, index) {
         e.preventDefault();
         return false;
       }
+      case 'ArrowUp': {
+        if(self.getIndex() != 0) {
+          var caret = self.getCaretPos();
+          var prev = self.getPreviousLine();
+          if(caret > prev.getLength()) {
+            setSelect(prev.contentelement, prev.getLength());
+          } else {
+            setSelect(prev.contentelement, caret);
+          }
+          e.preventDefault();
+          return false;
+        } else {
+          return true;
+        }
+      }
+      case 'ArrowDown': {
+        if(self.getIndex() < lines.length - 1) {
+          var caret = self.getCaretPos();
+          var next = self.getNextLine();
+          if(caret > next.getLength()) {
+            setSelect(next.contentelement, next.getLength());
+          } else {
+            setSelect(next.contentelement, caret);
+          }
+          e.preventDefault();
+          return false;
+        } else {
+          return true;
+        }
+      }
     }
   });
 }
