@@ -101,16 +101,11 @@ function Line(text, index) {
         }
       }
       case 'Enter': {
-        if(self.getCaretPos() == self.getLength()) {
-          let line = new Line('', self.getIndex() + 1);
-          setSelect(line.contentelement, 0);
-        } else {
-          let text = self.getText();
-          let caret = self.getCaretPos();
-          self.setText(text.substring(0,caret));
-          let line = new Line( text.substring(caret) , self.getIndex() + 1);
-          setSelect(line.contentelement, 0);
-        }
+        let text = self.getText();
+        let caret = self.getCaretPos();
+        self.setText(text.substring(0,caret));
+        let line = new Line( text.substring(caret) , self.getIndex() + 1);
+        setSelect(line.contentelement, 0);
         e.preventDefault();
         return false;
       }
