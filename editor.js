@@ -174,6 +174,8 @@ function lineCountChanged() {
   }
 }
 
-new Line('foo');
-new Line('bar');
-new Line('baz');
+// Initialize
+(function() {
+  var line = new Line();
+  setSelect(line.contentelement, 0);
+})();
