@@ -65,6 +65,9 @@ body {
   color: gray;
   counter-increment: lines; 
   content: counters(lines, "");
+  transition: width .6s;
+  overflow: hidden;
+  white-space: nowrap;
 }
 .linecontent {
   flex: 1 1 auto;

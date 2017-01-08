@@ -60,6 +60,7 @@ function Line(text, index) {
     editor.appendChild(this.element);
     lines.push(this);
   }
+  lineCountChanged();
   
   this.setText = function(_text) {
     this.contentelement.textContent = _text;
@@ -79,6 +80,7 @@ function Line(text, index) {
   this.remove = function() {
     editor.removeChild(this.element);
     lines.splice(this.getIndex(), 1);
+    lineCountChanged();
   }
   this.getLength = function() {
     return this.getText().length;
@@ -126,6 +128,17 @@ function Line(text, index) {
       }
     }
   });
+}
+
+var style = document.createElement('style');
+document.head.append(style);
+function lineCountChanged() {
+  // make sure line numbers are all the same width
+  if(lines.length) {
+    setTimeout(function() {
+      style.innerHTML = `.line::before { width: ${lines.length.toString().length + 1}ex; }`;
+    });
+  }
 }
 
 new Line('foo');
