@@ -75,6 +75,7 @@ body {
   margin-bottom: auto;
   min-height: 1em;
   word-break: break-all;
+  white-space: pre;
 }
 .line:hover .linecontent {
   background: rgba(100,100,100,.3);
