@@ -115,7 +115,7 @@ function Line(text, index) {
         return false;
       }
       case 'ArrowUp': {
-        if(self.getIndex() != 0) {
+        if(self.getIndex() !== 0) {
           var caret = self.getCaretPos();
           var prev = self.getPreviousLine();
           if(caret > prev.getLength()) {
@@ -138,6 +138,26 @@ function Line(text, index) {
           } else {
             setSelect(next.contentelement, caret);
           }
+          e.preventDefault();
+          return false;
+        } else {
+          return true;
+        }
+      }
+      case 'ArrowLeft': {
+        if(self.getIndex() !== 0 && self.getCaretPos() === 0) {
+          var prev = self.getPreviousLine();
+          setSelect(prev.contentelement, prev.getLength());
+          e.preventDefault();
+          return false;
+        } else {
+          return true;
+        }
+      }
+      case 'ArrowRight': {
+        if((self.getIndex() < lines.length - 1) && self.getCaretPos() === self.getLength()) {
+          var next = self.getNextLine();
+          setSelect(next.contentelement, 0);
           e.preventDefault();
           return false;
         } else {
