@@ -208,7 +208,8 @@ function Document(text) {
     new Line(this, split[i]);
   }
   
-  this.setSelect(this.lines[0].contentelement, 0);
+  var lastLine = this.lines[this.lines.length - 1]
+  this.setSelect(lastLine.contentelement, lastLine.getLength());
 }
 
 // Initialize
