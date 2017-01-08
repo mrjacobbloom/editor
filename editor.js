@@ -31,18 +31,6 @@ function setSelect(elem1, index1, elem2, index2) {
   sel.removeAllRanges();
   sel.addRange(range);
 }
-/*function getParentLine(node) {;
-  while(true) {
-    if(node == document.body || !node.parentElement) return null;
-    if(node.matches && node.matches('.line')) break;
-    node = node.parentElement;
-  }
-  return node
-}
-function getCurrentLine() {
-  var selection = window.getSelection();
-  return getParentLine(selection.focusNode);
-}*/
 
 var editor = document.querySelector('#editor');
 function Line(text, index) {
