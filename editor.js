@@ -79,6 +79,31 @@ function Line(text, index) {
   
   var self = this;
   
+  this.element.addEventListener('paste', function(e) {
+    if(e.clipboardData.types.indexOf('text/plain') > -1) {
+        var data = e.clipboardData.getData('text/plain');
+        //split at caret
+        var oldcontent = [
+          self.getText().substring(0, self.getCaretPos()),
+          self.getText().substring(self.getCaretPos())
+        ];
+        var split = data.split('\n');
+        var caret = split[split.length - 1].length;
+        if(split.length == 1) caret += oldcontent[0].length;
+        console.log(split)
+        split[0] = oldcontent[0] + split[0];
+        split[split.length - 1] = split[split.length - 1] + oldcontent[1];
+        var line = self;
+        var index = self.getIndex();
+        line.setText(split[0]);
+        for(let i = 1; i < split.length; i++) {
+          line = new Line(split[i], ++index);
+        }
+        setSelect(line.contentelement, caret)
+    }
+    e.preventDefault();
+  });
+  
   this.element.addEventListener('keydown', function(e) {
     console.log(e)
     switch (e.code) {
