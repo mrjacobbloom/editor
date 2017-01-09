@@ -51,6 +51,11 @@ body {
   border: 1px solid #ddd;
   padding: 10px;
   counter-reset: lines;
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Chrome/Safari/Opera */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none;
 }
 .line {
   outline: none;
@@ -82,6 +87,9 @@ body {
 }
 .line:last-child {
   flex: 1 0 auto;
+}
+.char.select {
+  background: rgba(134, 134, 204, 0.6);
 }
 .startcaret {
   min-height: 1em;

@@ -73,7 +73,7 @@ function Line(doc, text, index) {
       this.chars[0].remove()
     }
     for(let i = 0; i < _text.length; i++) {
-      console.log(new Char(doc, this, _text[i]));
+      new Char(doc, this, _text[i]);
     }
   }
   this.setText(text || '');
@@ -162,7 +162,49 @@ function Document(text) {
     } else {
       doc.caret = line.chars[index - 1];
     }
-    doc.caret.element.classList.add('caret');
+    while(doc.range && doc.range.chars.length) {
+      doc.range.chars.pop().element.classList.remove('select');
+    }
+    if(isRange
+      && doc.range.anchor != doc.caret) {
+      doc.range.isRange = true;
+      doc.range.focus = doc.caret;
+      
+      var start, end;
+      if(doc.range.anchor.line.getIndex() < doc.range.focus.line.getIndex()
+      || (doc.range.anchor.line.getIndex() == doc.range.focus.line.getIndex()
+          && doc.range.anchor.getIndex() < doc.range.focus.getIndex())) {
+        start = doc.range.anchor;
+        end = doc.range.focus;
+      } else {
+        start = doc.range.focus;
+        end = doc.range.anchor;
+      }
+      doc.range.chars = [];
+      var step = start;
+      while(step != end) {
+        if (!step.startcaret) {
+          doc.range.chars.push(step);
+          step.element.classList.add('select');
+        };
+        if(step.getNextChar()) {
+          step = step.getNextChar();
+        } else {
+          step = step.line.getNextLine().chars[0];
+        }
+      }
+      doc.range.chars.push(end);
+      end.element.classList.add('select');
+      
+    } else {
+      doc.caret.element.classList.add('caret');
+      doc.range = {
+        isRange: false, // !collapsed if this were a real range
+        chars: [],
+        anchor: doc.caret, // the start char
+        focus: doc.caret // the movable char
+      }
+    }
   }
   
   if(text === undefined) text = '';
@@ -216,9 +258,9 @@ function Document(text) {
         if(line.getIndex() !== 0) {
           let prev = line.getPreviousLine();
           if(doc.column > prev.getLength()) {
-            doc.setSelect(prev, prev.getLength());
+            doc.setSelect(prev, prev.getLength(), e.shiftKey);
           } else {
-            doc.setSelect(prev, doc.column);
+            doc.setSelect(prev, doc.column, e.shiftKey);
           }
         } else {
           doc.setSelect(line, 0);
@@ -231,9 +273,9 @@ function Document(text) {
         if(line.getIndex() < doc.lines.length - 1) {
           let next = line.getNextLine();
           if(doc.column > next.getLength()) {
-            doc.setSelect(next, next.getLength());
+            doc.setSelect(next, next.getLength(), e.shiftKey);
           } else {
-            doc.setSelect(next, doc.column);
+            doc.setSelect(next, doc.column, e.shiftKey);
           }
         } else {
           doc.setSelect(line, line.getLength());
@@ -250,7 +292,7 @@ function Document(text) {
             doc.column = prev.getLength();
           }
         } else {
-          doc.setSelect(line, doc.column - 1);
+          doc.setSelect(line, doc.column - 1, e.shiftKey);
           doc.column = doc.getColumn();
         }
         e.preventDefault();
@@ -262,7 +304,7 @@ function Document(text) {
           doc.setSelect(next, 0);
           doc.column = 0;
         } else {
-          doc.setSelect(line, doc.column + 1);
+          doc.setSelect(line, doc.column + 1, e.shiftKey);
           doc.column = doc.getColumn();
         }
         e.preventDefault();
