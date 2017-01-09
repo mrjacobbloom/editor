@@ -101,35 +101,6 @@ function Line(doc, text, index) {
   this.getCaretPos = function() {
     return window.getSelection().anchorOffset;
   }
-  
-  this.insertAtCaret = function(data) {
-    var oldcontent = [
-      line.getText().substring(0, doc.getColumn()),
-      line.getText().substring(doc.getColumn())
-    ];
-    var split = data.split('\n');
-    var caret = split[split.length - 1].length;
-    if(split.length == 1) caret += oldcontent[0].length;
-    split[0] = oldcontent[0] + split[0];
-    split[split.length - 1] = split[split.length - 1] + oldcontent[1];
-    var currentline = line;
-    var index = line.getIndex();
-    currentline.setText(split[0]);
-    for(let i = 1; i < split.length; i++) {
-      currentline = new Line(doc, split[i], ++index);
-    }
-    doc.setSelect(currentline, caret)
-    doc.column = doc.getColumn();
-  }
-  
-  this.element.addEventListener('paste', function(e) {
-    if(e.clipboardData.types.indexOf('text/plain') > -1) {
-        var data = e.clipboardData.getData('text/plain');
-        //split at caret
-        line.insertAtCaret(data);
-    }
-    e.preventDefault();
-  });
 }
 
 function Document(text) {
@@ -225,8 +196,30 @@ function Document(text) {
     }
   }
   
+  this.insertAtCaret = function(data) {
+    var line = doc.caret.line;
+    var oldcontent = [
+      line.getText().substring(0, doc.getColumn()),
+      line.getText().substring(doc.getColumn())
+    ];
+    var split = data.split('\n');
+    var caret = split[split.length - 1].length;
+    if(split.length == 1) caret += oldcontent[0].length;
+    split[0] = oldcontent[0] + split[0];
+    split[split.length - 1] = split[split.length - 1] + oldcontent[1];
+    var currentline = line;
+    var index = line.getIndex();
+    currentline.setText(split[0]);
+    for(let i = 1; i < split.length; i++) {
+      currentline = new Line(doc, split[i], ++index);
+    }
+    doc.setSelect(currentline, caret)
+    doc.column = doc.getColumn();
+  }
+  
   document.body.addEventListener('keydown', function(e) {
-    console.log(e)
+    if(e.ctrlKey || e.altKey || e.metaKey) return true;
+    console.log(e);
     var line = doc.caret.line;
     switch (e.code) {
       case 'Backspace': {
@@ -250,7 +243,7 @@ function Document(text) {
         return false;
       }
       case 'Enter': {
-        line.insertAtCaret('\n');
+        doc.insertAtCaret('\n');
         e.preventDefault();
         return false;
       }
@@ -311,13 +304,13 @@ function Document(text) {
         return false;
       }
       case 'Tab': {
-        line.insertAtCaret(doc.tab);
+        doc.insertAtCaret(doc.tab);
         e.preventDefault();
         return false;
       }
       default: {
         if(e.key.length == 1) {
-          line.insertAtCaret(e.key);
+          doc.insertAtCaret(e.key);
           e.preventDefault();
           return false;
         } else {
@@ -325,6 +318,34 @@ function Document(text) {
         }
       }
     }
+  });
+  
+  document.body.addEventListener('paste', function(e) {
+    if(e.clipboardData.types.indexOf('text/plain') > -1) {
+        var data = e.clipboardData.getData('text/plain');
+        doc.insertAtCaret(data);
+    }
+    e.preventDefault();
+  });
+  
+  function copy(e){
+    if(!doc.range.isRange) return false;
+    var exportedText = '';
+    var currentline = doc.range.chars[0].line;
+    for(let i = 0; i < doc.range.chars.length; i++) {
+      if(doc.range.chars[i].line != currentline) {
+        currentline = doc.range.chars[i].line;
+        exportedText += '\n';
+      }
+      exportedText += doc.range.chars[i].char;
+    }
+    e.clipboardData.setData('text/plain', exportedText);
+    e.preventDefault();
+  }
+  document.addEventListener('copy', copy);
+  document.addEventListener('cut', function(e) {
+    copy(e);
+    // do backspace-y things
   });
 }
 
