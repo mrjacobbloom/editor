@@ -167,11 +167,20 @@ function Line(doc, text, index) {
       }
       case 'Tab': {
         line.insertAtCaret(doc.tab);
+        doc.column = line.getCaretPos();
+        e.preventDefault();
+        return false;
+      }
+      // Evil hax to match letter keys
+      case (e.code.match(/Key[A-Z]/) ? e.code : false): {
+        console.log('appended ' + e.key);
+        line.insertAtCaret(e.key);
+        doc.column = line.getCaretPos();
         e.preventDefault();
         return false;
       }
       default: {
-        doc.column = line.getCaretPos() + 1;
+        return true;
       }
     }
   });
