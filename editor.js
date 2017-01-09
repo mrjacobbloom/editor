@@ -109,8 +109,8 @@ function Line(doc, text, index) {
       }
       case 'ArrowUp': {
         if(line.getIndex() !== 0) {
-          var caret = line.getCaretPos();
-          var prev = line.getPreviousLine();
+          let caret = line.getCaretPos();
+          let prev = line.getPreviousLine();
           if(caret > prev.getLength()) {
             doc.setSelect(prev.contentelement, prev.getLength());
           } else {
@@ -124,8 +124,8 @@ function Line(doc, text, index) {
       }
       case 'ArrowDown': {
         if(line.getIndex() < doc.lines.length - 1) {
-          var caret = line.getCaretPos();
-          var next = line.getNextLine();
+          let caret = line.getCaretPos();
+          let next = line.getNextLine();
           if(caret > next.getLength()) {
             doc.setSelect(next.contentelement, next.getLength());
           } else {
@@ -139,7 +139,7 @@ function Line(doc, text, index) {
       }
       case 'ArrowLeft': {
         if(line.getIndex() !== 0 && line.getCaretPos() === 0) {
-          var prev = line.getPreviousLine();
+          let prev = line.getPreviousLine();
           doc.setSelect(prev.contentelement, prev.getLength());
           e.preventDefault();
           return false;
@@ -149,7 +149,7 @@ function Line(doc, text, index) {
       }
       case 'ArrowRight': {
         if((line.getIndex() < doc.lines.length - 1) && line.getCaretPos() === line.getLength()) {
-          var next = line.getNextLine();
+          let next = line.getNextLine();
           doc.setSelect(next.contentelement, 0);
           e.preventDefault();
           return false;
