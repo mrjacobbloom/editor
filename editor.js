@@ -223,21 +223,37 @@ function Document(text) {
     var line = doc.caret.line;
     switch (e.code) {
       case 'Backspace': {
-        // this logic should be different for selections, esp. multiline
-        if(doc.getColumn() === 0) {
-          let prev = line.getPreviousLine();
-          if(!prev) {
-            e.preventDefault();
-            return false;
+        if(doc.range.isRange) {
+          //get previous content of start's line
+          var start = doc.range.chars[0];
+          var end = doc.range.chars[doc.range.chars.length - 1];
+          var prev = start.line.chars.slice(0, start.getIndex());
+          var next = end.line.chars.slice(end.getIndex() + 1);
+          var step = start;
+          var startindex = start.line.getIndex();
+          var endindex = end.line.getIndex();
+          for(let i = startindex; i <= endindex; i++) {
+            doc.lines[i].remove();
           }
-          let oldprevlength = prev.getLength();
-          prev.setText(prev.getText() + line.getText());
-          doc.setSelect(prev, oldprevlength);
-          line.remove();
+          var newtext = prev.join('') + next.join('');
+          var line = new Line(doc, newtext, startindex);
+          doc.setSelect(line, prev.length);
         } else {
-          var index = doc.getColumn();
-          doc.caret.remove()
-          doc.setSelect(line, index - 1);
+          if(doc.getColumn() === 0) {
+            let prev = line.getPreviousLine();
+            if(!prev) {
+              e.preventDefault();
+              return false;
+            }
+            let oldprevlength = prev.getLength();
+            prev.setText(prev.getText() + line.getText());
+            doc.setSelect(prev, oldprevlength);
+            line.remove();
+          } else {
+            var index = doc.getColumn();
+            doc.caret.remove()
+            doc.setSelect(line, index - 1);
+          }
         }
         e.preventDefault();
         return false;
