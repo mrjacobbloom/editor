@@ -77,6 +77,10 @@ function Line(doc, text, index) {
     e.preventDefault();
   });
   
+  this.element.addEventListener('click', function(e) {
+    doc.column = line.getCaretPos();
+  });
+  
   this.element.addEventListener('keydown', function(e) {
     console.log(e)
     switch (e.code) {
@@ -109,31 +113,31 @@ function Line(doc, text, index) {
       }
       case 'ArrowUp': {
         if(line.getIndex() !== 0) {
-          let caret = line.getCaretPos();
           let prev = line.getPreviousLine();
-          if(caret > prev.getLength()) {
+          if(doc.column > prev.getLength()) {
             doc.setSelect(prev.contentelement, prev.getLength());
           } else {
-            doc.setSelect(prev.contentelement, caret);
+            doc.setSelect(prev.contentelement, doc.column);
           }
           e.preventDefault();
           return false;
         } else {
+          doc.column = 0;
           return true;
         }
       }
       case 'ArrowDown': {
         if(line.getIndex() < doc.lines.length - 1) {
-          let caret = line.getCaretPos();
           let next = line.getNextLine();
-          if(caret > next.getLength()) {
+          if(doc.column > next.getLength()) {
             doc.setSelect(next.contentelement, next.getLength());
           } else {
-            doc.setSelect(next.contentelement, caret);
+            doc.setSelect(next.contentelement, doc.column);
           }
           e.preventDefault();
           return false;
         } else {
+          doc.column = line.getLength();
           return true;
         }
       }
@@ -141,9 +145,11 @@ function Line(doc, text, index) {
         if(line.getIndex() !== 0 && line.getCaretPos() === 0) {
           let prev = line.getPreviousLine();
           doc.setSelect(prev.contentelement, prev.getLength());
+          doc.column = prev.getLength();
           e.preventDefault();
           return false;
         } else {
+          doc.column = line.getCaretPos() - 1;
           return true;
         }
       }
@@ -151,9 +157,11 @@ function Line(doc, text, index) {
         if((line.getIndex() < doc.lines.length - 1) && line.getCaretPos() === line.getLength()) {
           let next = line.getNextLine();
           doc.setSelect(next.contentelement, 0);
+          doc.column = 0;
           e.preventDefault();
           return false;
         } else {
+          doc.column = line.getCaretPos() + 1;
           return true;
         }
       }
@@ -161,6 +169,9 @@ function Line(doc, text, index) {
         line.insertAtCaret(doc.tab);
         e.preventDefault();
         return false;
+      }
+      default: {
+        doc.column = line.getCaretPos() + 1;
       }
     }
   });
@@ -221,6 +232,7 @@ function Document(text) {
   
   var lastLine = this.lines[this.lines.length - 1]
   this.setSelect(lastLine.contentelement, lastLine.getLength());
+  this.column = lastLine.getLength();
 }
 
 // Initialize
