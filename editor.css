@@ -94,7 +94,7 @@ body {
 
 @keyframes caret {
   0% {
-    box-shadow: 1px 0 0 white;
+    box-shadow: 1px 0 0 #ddd;
   }
   50% {
     box-shadow: 1px 0 0 transparent;
