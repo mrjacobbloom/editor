@@ -134,7 +134,7 @@ function Document(text) {
       doc.caret = line.chars[index - 1];
     }
     while(doc.range && doc.range.chars.length) {
-      doc.range.chars.pop().element.classList.remove('select');
+      doc.range.chars.pop().element.classList.remove('select', 'blink-left', 'blink-right');
     }
     if(isRange
       && doc.range.anchor != doc.caret) {
@@ -147,9 +147,11 @@ function Document(text) {
           && doc.range.anchor.getIndex() < doc.range.focus.getIndex())) {
         start = doc.range.anchor;
         end = doc.range.focus;
+        end.element.classList.add('blink-right');
       } else {
         start = doc.range.focus;
         end = doc.range.anchor;
+        start.element.classList.add('blink-left');
       }
       doc.range.chars = [];
       var step = start;
