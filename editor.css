@@ -83,3 +83,23 @@ body {
 .line:last-child {
   flex: 1 0 auto;
 }
+.startcaret {
+  min-height: 1em;
+  width: 1px;
+  display: inline-block;
+}
+.caret {
+  animation: 1s caret infinite step-end;
+}
+
+@keyframes caret {
+  0% {
+    box-shadow: 1px 0 0 white;
+  }
+  50% {
+    box-shadow: 1px 0 0 transparent;
+  }
+  100% {
+    box-shadow: 1px 0 0 transparent;
+  }
+}

@@ -3,14 +3,50 @@ document.querySelector('#cogbutton').addEventListener('click', function() {
 });
 // also on blur, or on document.body when target isn't in the settingspanel
 
+function Char(doc, line, char, index) {
+  this.char = char;
+  this.toString = function() {
+    return this.char;
+  }
+  this.element = document.createElement('span');
+  this.element.classList.add('char');
+  this.element.textContent = this.char;
+  this.line = line;
+  if(index !== undefined && line.getLength()) {
+    this.line.contentelement.insertBefore(this.element, this.line.chars[index].element);
+    this.line.chars.splice(index, 0, this);
+  } else {
+    this.line.contentelement.appendChild(this.element);
+    this.line.chars.push(this);
+  }
+  this.getIndex = function() {
+    return this.line.chars.indexOf(this);
+  }
+  this.getNextChar = function() {
+    return this.line.chars[this.getIndex() + 1];
+  }
+  this.getPreviousChar = function() {
+    return this.line.chars[this.getIndex() - 1];
+  }
+  this.remove = function() {
+    this.line.contentelement.removeChild(this.element);
+    this.line.chars.splice(this.getIndex(), 1);
+  }
+  
+  var self = this;
+  this.element.addEventListener('click', function(e) {
+    doc.setSelect(self.line, self.getIndex() + 1);
+    doc.column = doc.getColumn();
+  });
+}
+
 function Line(doc, text, index) {
   this.element = document.createElement('div');
   this.element.classList.add('line');
-  this.element.setAttribute('contenteditable', '');
+  //this.element.setAttribute('contenteditable', '');
   this.contentelement = document.createElement('div');
   this.contentelement.classList.add('linecontent');
   this.element.appendChild(this.contentelement);
-  this.contentelement.appendChild(document.createTextNode(text || ''));
   if(index !== undefined && doc.lines[index]) {
     doc.editor.insertBefore(this.element, doc.lines[index].element);
     doc.lines.splice(index, 0, this);
@@ -19,12 +55,34 @@ function Line(doc, text, index) {
     doc.lines.push(this);
   }
   doc.lineCountChanged();
+  this.chars = [];
+  
+  var line = this;
+  
+  // an empty span that can act as caret for the 0th index
+  this.startcaret = {
+    startcaret: true,
+    element: document.createElement('span'),
+    line: line
+  }
+  this.startcaret.element.classList.add('startcaret');
+  this.contentelement.appendChild(this.startcaret.element);
   
   this.setText = function(_text) {
-    this.contentelement.textContent = _text;
+    while(this.chars.length) {
+      this.chars[0].remove()
+    }
+    for(let i = 0; i < _text.length; i++) {
+      console.log(new Char(doc, this, _text[i]));
+    }
   }
+  this.setText(text || '');
   this.getText = function() {
-    return this.contentelement.textContent;
+    return this.chars.join('');
+  }
+  this.toString = this.getText;
+  this.getIndex = function() {
+    return doc.lines.indexOf(this);
   }
   this.getNextLine = function() {
     return doc.lines[this.getIndex() + 1];
@@ -32,27 +90,22 @@ function Line(doc, text, index) {
   this.getPreviousLine = function() {
     return doc.lines[this.getIndex() - 1];
   }
-  this.getIndex = function() {
-    return doc.lines.indexOf(this);
-  }
   this.remove = function() {
     doc.editor.removeChild(this.element);
     doc.lines.splice(this.getIndex(), 1);
     doc.lineCountChanged();
   }
   this.getLength = function() {
-    return this.getText().length;
+    return this.chars.length;
   }
   this.getCaretPos = function() {
     return window.getSelection().anchorOffset;
   }
   
-  var line = this;
-  
   this.insertAtCaret = function(data) {
     var oldcontent = [
-      line.getText().substring(0, line.getCaretPos()),
-      line.getText().substring(line.getCaretPos())
+      line.getText().substring(0, doc.getColumn()),
+      line.getText().substring(doc.getColumn())
     ];
     var split = data.split('\n');
     var caret = split[split.length - 1].length;
@@ -65,7 +118,8 @@ function Line(doc, text, index) {
     for(let i = 1; i < split.length; i++) {
       currentline = new Line(doc, split[i], ++index);
     }
-    doc.setSelect(currentline.contentelement, caret)
+    doc.setSelect(currentline, caret)
+    doc.column = doc.getColumn();
   }
   
   this.element.addEventListener('paste', function(e) {
@@ -75,114 +129,6 @@ function Line(doc, text, index) {
         line.insertAtCaret(data);
     }
     e.preventDefault();
-  });
-  
-  this.element.addEventListener('click', function(e) {
-    doc.column = line.getCaretPos();
-  });
-  
-  this.element.addEventListener('keydown', function(e) {
-    console.log(e)
-    switch (e.code) {
-      case 'Backspace': {
-        // this logic should be different for selections, esp. multiline
-        if(line.getCaretPos() === 0) {
-          let prev = line.getPreviousLine();
-          if(!prev) {
-            e.preventDefault();
-            return false;
-          }
-          let oldprevlength = prev.getLength();
-          prev.setText(prev.getText() + line.getText());
-          doc.setSelect(prev.contentelement, oldprevlength);
-          line.remove();
-          e.preventDefault();
-          return false;
-        } else {
-          return true;
-        }
-      }
-      case 'Enter': {
-        let text = line.getText();
-        let caret = line.getCaretPos();
-        line.setText(text.substring(0,caret));
-        let newline = new Line(doc, text.substring(caret) , line.getIndex() + 1);
-        doc.setSelect(newline.contentelement, 0);
-        e.preventDefault();
-        return false;
-      }
-      case 'ArrowUp': {
-        if(line.getIndex() !== 0) {
-          let prev = line.getPreviousLine();
-          if(doc.column > prev.getLength()) {
-            doc.setSelect(prev.contentelement, prev.getLength());
-          } else {
-            doc.setSelect(prev.contentelement, doc.column);
-          }
-          e.preventDefault();
-          return false;
-        } else {
-          doc.column = 0;
-          return true;
-        }
-      }
-      case 'ArrowDown': {
-        if(line.getIndex() < doc.lines.length - 1) {
-          let next = line.getNextLine();
-          if(doc.column > next.getLength()) {
-            doc.setSelect(next.contentelement, next.getLength());
-          } else {
-            doc.setSelect(next.contentelement, doc.column);
-          }
-          e.preventDefault();
-          return false;
-        } else {
-          doc.column = line.getLength();
-          return true;
-        }
-      }
-      case 'ArrowLeft': {
-        if(line.getIndex() !== 0 && line.getCaretPos() === 0) {
-          let prev = line.getPreviousLine();
-          doc.setSelect(prev.contentelement, prev.getLength());
-          doc.column = prev.getLength();
-          e.preventDefault();
-          return false;
-        } else {
-          doc.column = line.getCaretPos() - 1;
-          return true;
-        }
-      }
-      case 'ArrowRight': {
-        if((line.getIndex() < doc.lines.length - 1) && line.getCaretPos() === line.getLength()) {
-          let next = line.getNextLine();
-          doc.setSelect(next.contentelement, 0);
-          doc.column = 0;
-          e.preventDefault();
-          return false;
-        } else {
-          doc.column = line.getCaretPos() + 1;
-          return true;
-        }
-      }
-      case 'Tab': {
-        line.insertAtCaret(doc.tab);
-        doc.column = line.getCaretPos();
-        e.preventDefault();
-        return false;
-      }
-      // Evil hax to match letter keys
-      case (e.code.match(/Key[A-Z]/) ? e.code : false): {
-        console.log('appended ' + e.key);
-        line.insertAtCaret(e.key);
-        doc.column = line.getCaretPos();
-        e.preventDefault();
-        return false;
-      }
-      default: {
-        return true;
-      }
-    }
   });
 }
 
@@ -205,32 +151,18 @@ function Document(text) {
   
   this.editor = document.querySelector('#editor');
   
-  this.setSelect = function(elem1, index1, elem2, index2) {
-    
-    var getTextElement = function(contentelement) {
-      if(contentelement.children.length != 1) {
-        let text = contentelement.textContent;
-        while (contentelement.firstChild) {
-          contentelement.removeChild(contentelement.firstChild);
-        }
-        let textnode = document.createTextNode(text);
-        contentelement.appendChild(textnode);
-        return textnode;
-      } else {
-        return contentelement.firstChild;
-      }
+  this.caret = null;
+  this.setSelect = function(line, index, isRange) {
+    if(doc.caret) {
+      doc.caret.element.classList.remove('caret');
     }
-    
-    var range = document.createRange();
-    var sel = window.getSelection();
-    range.setStart(getTextElement(elem1), index1);
-    if(elem2) {
-      range.setEnd(getTextElement(elem2), index2);
+    if (index > line.getLength()) index = line.getLength();
+    if(index == 0) {
+      doc.caret = line.startcaret;
     } else {
-      range.collapse();
+      doc.caret = line.chars[index - 1];
     }
-    sel.removeAllRanges();
-    sel.addRange(range);
+    doc.caret.element.classList.add('caret');
   }
   
   if(text === undefined) text = '';
@@ -240,8 +172,118 @@ function Document(text) {
   }
   
   var lastLine = this.lines[this.lines.length - 1]
-  this.setSelect(lastLine.contentelement, lastLine.getLength());
+  this.setSelect(lastLine, lastLine.getLength());
   this.column = lastLine.getLength();
+  
+  this.getColumn = function() {
+    if(this.caret.startcaret) {
+      return 0;
+    } else {
+    return this.caret.getIndex() + 1;
+    }
+  }
+  
+  document.body.addEventListener('keydown', function(e) {
+    console.log(e)
+    var line = doc.caret.line;
+    switch (e.code) {
+      case 'Backspace': {
+        // this logic should be different for selections, esp. multiline
+        if(doc.getColumn() === 0) {
+          let prev = line.getPreviousLine();
+          if(!prev) {
+            e.preventDefault();
+            return false;
+          }
+          let oldprevlength = prev.getLength();
+          prev.setText(prev.getText() + line.getText());
+          doc.setSelect(prev, oldprevlength);
+          line.remove();
+        } else {
+          var index = doc.getColumn();
+          doc.caret.remove()
+          doc.setSelect(line, index - 1);
+        }
+        e.preventDefault();
+        return false;
+      }
+      case 'Enter': {
+        line.insertAtCaret('\n');
+        e.preventDefault();
+        return false;
+      }
+      case 'ArrowUp': {
+        if(line.getIndex() !== 0) {
+          let prev = line.getPreviousLine();
+          if(doc.column > prev.getLength()) {
+            doc.setSelect(prev, prev.getLength());
+          } else {
+            doc.setSelect(prev, doc.column);
+          }
+        } else {
+          doc.setSelect(line, 0);
+          doc.column = doc.getColumn();
+        }
+        e.preventDefault();
+        return false;
+      }
+      case 'ArrowDown': {
+        if(line.getIndex() < doc.lines.length - 1) {
+          let next = line.getNextLine();
+          if(doc.column > next.getLength()) {
+            doc.setSelect(next, next.getLength());
+          } else {
+            doc.setSelect(next, doc.column);
+          }
+        } else {
+          doc.setSelect(line, line.getLength());
+          doc.column = doc.getColumn();
+        }
+        e.preventDefault();
+        return false;
+      }
+      case 'ArrowLeft': {
+        if(doc.getColumn() === 0) {
+          if(line.getIndex() !== 0) {
+            let prev = line.getPreviousLine();
+            doc.setSelect(prev, prev.getLength());
+            doc.column = prev.getLength();
+          }
+        } else {
+          doc.setSelect(line, doc.column - 1);
+          doc.column = doc.getColumn();
+        }
+        e.preventDefault();
+        return false;
+      }
+      case 'ArrowRight': {
+        if((line.getIndex() < doc.lines.length - 1) && doc.getColumn() === line.getLength()) {
+          let next = line.getNextLine();
+          doc.setSelect(next, 0);
+          doc.column = 0;
+        } else {
+          doc.setSelect(line, doc.column + 1);
+          doc.column = doc.getColumn();
+        }
+        e.preventDefault();
+        return false;
+      }
+      case 'Tab': {
+        line.insertAtCaret(doc.tab);
+        e.preventDefault();
+        return false;
+      }
+      default: {
+        if(e.key.length == 1) {
+          line.insertAtCaret(e.key);
+          e.preventDefault();
+          return false;
+        } else {
+          return true;
+        }
+      }
+    }
+  });
 }
 
 // Initialize
