@@ -34,9 +34,19 @@ function Char(doc, line, char, index) {
   }
   
   var self = this;
-  this.element.addEventListener('click', function(e) {
+  this.element.addEventListener('mousedown', function(e) {
+    doc.dragging = true;
     doc.setSelect(self.line, self.getIndex() + 1);
     doc.column = doc.getColumn();
+  });
+  this.element.addEventListener('mousemove', function(e) {
+    if(doc.dragging) {
+      doc.setSelect(self.line, self.getIndex() + 1, true);
+      doc.column = doc.getColumn();
+    }
+  });
+  this.element.addEventListener('mouseup', function(e) {
+    doc.dragging = false;
   });
 }
 
@@ -119,7 +129,7 @@ function Document(text) {
   }
   
   this.tab = '    ';
-  
+  this.dragging = false;
   this.editor = document.querySelector('#editor');
   
   this.caret = null;
