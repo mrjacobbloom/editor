@@ -73,7 +73,8 @@ function Line(doc, text, index) {
   this.startcaret = {
     startcaret: true,
     element: document.createElement('span'),
-    line: line
+    line: line,
+    getIndex: function() {return -1;}
   }
   this.startcaret.element.classList.add('startcaret');
   this.contentelement.appendChild(this.startcaret.element);
@@ -134,9 +135,9 @@ function Document(text) {
   
   this.caret = null;
   this.setSelect = function(line, index, isRange) {
-    if(doc.caret) {
-      doc.caret.element.classList.remove('caret');
-    }
+    if(doc.caret) doc.caret.element.classList.remove('caret', 'select', 'blink-left', 'blink-right');
+    if(doc.range && doc.range.anchor) doc.range.anchor.element.classList.remove('select', 'blink-left', 'blink-right');
+    if(doc.range && doc.range.focus) doc.range.focus.element.classList.remove('select', 'blink-left', 'blink-right');
     if (index > line.getLength()) index = line.getLength();
     if(index == 0) {
       doc.caret = line.startcaret;
@@ -146,46 +147,68 @@ function Document(text) {
     while(doc.range && doc.range.chars.length) {
       doc.range.chars.pop().element.classList.remove('select', 'blink-left', 'blink-right');
     }
-    if(isRange
-      && doc.range.anchor != doc.caret) {
+    if(isRange && doc.range.anchor != doc.caret) {
       doc.range.isRange = true;
       doc.range.focus = doc.caret;
       
       var start, end;
       if(doc.range.anchor.line.getIndex() < doc.range.focus.line.getIndex()
-      || (doc.range.anchor.line.getIndex() == doc.range.focus.line.getIndex()
+      || (doc.range.anchor.line == doc.range.focus.line
           && doc.range.anchor.getIndex() < doc.range.focus.getIndex())) {
+        console.log('anchor, focus')
         start = doc.range.anchor;
         end = doc.range.focus;
-        end.element.classList.add('blink-right');
+        
+        /*f(start.startcaret) start = start.line.chars[0];
+        if(end.startcaret) {
+          let prev = end.line.getPreviousLine();
+          end = prev.chars[prev.getLength() - 1];
+        }*/
       } else {
+        console.log('focus, anchor')
         start = doc.range.focus;
         end = doc.range.anchor;
-        start.element.classList.add('blink-left');
+        
+        /*if(start.startcaret) start = start.line.chars[0];
+        if(end.startcaret) {
+          let prev = end.line.getPreviousLine();
+          end = prev.chars[prev.getLength() - 1];
+        }*/
       }
+      doc.range.start = start;
       doc.range.chars = [];
       var step = start;
       while(step != end) {
-        if (!step.startcaret) {
+        if (step.startcaret) {
+          step = step.line.chars[0];
+        } else {
           doc.range.chars.push(step);
           step.element.classList.add('select');
-        };
-        if(step.getNextChar()) {
-          step = step.getNextChar();
-        } else {
-          step = step.line.getNextLine().chars[0];
+          if(start == doc.range.focus) {
+            start.element.classList.add('blink-left');
+          } else {
+            end.element.classList.add('blink-right');
+          }
+          if(step.getNextChar && step.getNextChar()) {
+            step = step.getNextChar();
+          } else {
+            step = step.line.getNextLine().chars[0];
+          }
         }
       }
-      doc.range.chars.push(end);
-      end.element.classList.add('select');
-      
+      if (!end.startcaret) {
+        doc.range.chars.push(end);
+        end.element.classList.add('select');
+      }
+      console.log([`${start.line.getIndex()}:${start.getIndex()}`, `${end.line.getIndex()}:${end.getIndex()}`]);
     } else {
       doc.caret.element.classList.add('caret');
       doc.range = {
         isRange: false, // !collapsed if this were a real range
         chars: [],
         anchor: doc.caret, // the start char
-        focus: doc.caret // the movable char
+        focus: doc.caret, // the movable char
+        start: doc.caret
       }
     }
   }
@@ -201,10 +224,16 @@ function Document(text) {
   this.column = lastLine.getLength();
   
   this.getColumn = function() {
-    if(this.caret.startcaret) {
+    if(this.range.isRange) {
+      if(this.range.focus.startcaret) {
+        return 0;
+      } else {
+        return this.range.focus.getIndex() + 1;
+      }
+    } else if(this.caret.startcaret) {
       return 0;
     } else {
-    return this.caret.getIndex() + 1;
+      return this.caret.getIndex() + 1;
     }
   }
   
@@ -306,10 +335,11 @@ function Document(text) {
         return false;
       }
       case 'ArrowLeft': {
+        console.log(doc.getColumn())
         if(doc.getColumn() === 0) {
           if(line.getIndex() !== 0) {
             let prev = line.getPreviousLine();
-            doc.setSelect(prev, prev.getLength());
+            doc.setSelect(prev, prev.getLength(), e.shiftKey);
             doc.column = prev.getLength();
           }
         } else {
@@ -322,7 +352,7 @@ function Document(text) {
       case 'ArrowRight': {
         if((line.getIndex() < doc.lines.length - 1) && doc.getColumn() === line.getLength()) {
           let next = line.getNextLine();
-          doc.setSelect(next, 0);
+          doc.setSelect(next, 0, e.shiftKey);
           doc.column = 0;
         } else {
           doc.setSelect(line, doc.column + 1, e.shiftKey);

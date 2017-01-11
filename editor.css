@@ -91,10 +91,10 @@ body {
 .char.select {
   background: rgba(134, 134, 204, 0.6);
 }
-.char.blink-left {
+.blink-left {
   animation: 1s caret-left infinite step-end;
 }
-.char.blink-right {
+.blink-right {
   animation: 1s caret-right infinite step-end;
 }
 .startcaret {
