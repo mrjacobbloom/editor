@@ -201,7 +201,7 @@ function Caret(doc, isAnchor) {
       return null;
     }
   }
-  this.getPrevChar = function() {
+  this.getPreviousChar = function() {
     if(this.index > 0) {
       return caret.line.chars[this.index - 1];
     } else {
@@ -303,7 +303,7 @@ function Document(text) {
             line.remove();
           } else {
             var index = doc.caret.index;
-            doc.caret.remove()
+            doc.caret.getPreviousChar().remove();
             doc.caret.setSelect(line, index - 1);
           }
         }
@@ -372,14 +372,14 @@ function Document(text) {
         return false;
       }
       case 'Tab': {
-        doc.deleteSelection()
+        doc.deleteSelection();
         doc.insertAtCaret(doc.tab);
         e.preventDefault();
         return false;
       }
       default: {
         if(e.key.length == 1) {
-          doc.deleteSelection()
+          doc.deleteSelection();
           doc.insertAtCaret(e.key);
           e.preventDefault();
           return false;
