@@ -91,40 +91,26 @@ body {
 .char.select {
   background: rgba(134, 134, 204, 0.6);
 }
-.blink-left {
-  animation: 1s caret-left infinite step-end;
-}
-.blink-right {
-  animation: 1s caret-right infinite step-end;
-}
-.startcaret {
-  min-height: 1em;
-  width: 1px;
-  display: inline-block;
-}
 .caret {
-  animation: 1s caret-right infinite step-end;
+  display: inline-block;
+  width: 0;
+  height: 0;
+  vertical-align: text-top;
+}
+.caret-blinker {
+  animation: 1s caret infinite step-end;
+  height: 1em;
+  width: 1px;
 }
 
-@keyframes caret-right {
+@keyframes caret {
   0% {
-    box-shadow: 1px 0 0 #ddd;
+    background: #ddd;
   }
   50% {
-    box-shadow: 1px 0 0 transparent;
+    background: transparent;
   }
   100% {
-    box-shadow: 1px 0 0 transparent;
-  }
-}
-@keyframes caret-left {
-  0% {
-    box-shadow: -1px 0 0 #ddd;
-  }
-  50% {
-    box-shadow: -1px 0 0 transparent;
-  }
-  100% {
-    box-shadow: -1px 0 0 transparent;
+    background: transparent;
   }
 }
