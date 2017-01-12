@@ -39,17 +39,22 @@ function Char(doc, line, char, index) {
   var self = this;
   this.element.addEventListener('mousedown', function(e) {
     doc.dragging = true;
-    doc.caret.setSelect(self.line, self.getIndex() + 1);
+    if(e.clientX > self.element.getBoundingClientRect().left + (self.element.offsetWidth/2)) {
+      doc.caret.setSelect(self.line, self.getIndex() + 1);
+    } else {
+      doc.caret.setSelect(self.line, self.getIndex());
+    }
     doc.caret.column = doc.caret.index;
   });
   this.element.addEventListener('mousemove', function(e) {
     if(doc.dragging) {
-      doc.caret.setSelect(self.line, self.getIndex() + 1, true);
+      if(e.clientX > self.element.getBoundingClientRect().left + (self.element.offsetWidth/2)) {
+        doc.caret.setSelect(self.line, self.getIndex() + 1, true);
+      } else {
+        doc.caret.setSelect(self.line, self.getIndex(), true);
+      }
       doc.caret.column = doc.caret.index;
     }
-  });
-  this.element.addEventListener('mouseup', function(e) {
-    doc.dragging = false;
   });
 }
 
@@ -102,6 +107,12 @@ function Line(doc, text, index) {
   this.getLength = function() {
     return this.chars.length;
   }
+  this.element.addEventListener('mousedown', function(e) {
+    doc.dragging = true;
+    if(e.target == line.element || e.target == line.contentelement) {
+      doc.caret.setSelect(line, line.getLength());
+    }
+  });
 }
 
 function Caret(doc, isAnchor) {
@@ -281,6 +292,10 @@ function Document(text) {
     doc.caret.setSelect(currentline, caret)
     doc.caret.column = doc.caret.index;
   }
+  
+  this.editor.addEventListener('mouseup', function(e) {
+    doc.dragging = false;
+  });
   
   document.body.addEventListener('keydown', function(e) {
     if(e.ctrlKey || e.altKey || e.metaKey) return true;
