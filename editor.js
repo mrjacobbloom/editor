@@ -298,7 +298,17 @@ function Document(text) {
   });
   
   document.body.addEventListener('keydown', function(e) {
-    if(e.ctrlKey || e.altKey || e.metaKey) return true;
+    if(e.ctrlKey || e.altKey || e.metaKey) {
+      if(e.code == 'KeyA') {
+        doc.caret.setSelect(doc.lines[0], 0);
+        let lastLine = doc.lines[doc.lines.length - 1];
+        doc.caret.setSelect(lastLine, lastLine.getLength(), true);
+        e.preventDefault();
+        return false;
+      } else {
+        return true;
+      }
+    }
     console.log(e);
     var line = doc.caret.line;
     switch (e.code) {
