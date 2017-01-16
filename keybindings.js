@@ -11,7 +11,39 @@ var KEYBINDINGS = {
           doc.caret.setSelect(lastLine, lastLine.getLength(), true);
         },
     },
-    'SHIFT': {},
+    'SHIFT': {
+      'Tab':
+        function(e) {
+          var unTabLine = function(line) {
+            if(line.getText().substring(0, doc.tab.length) == doc.tab) {
+              line.setText(line.getText().substring(doc.tab.length));
+              return true;
+            } else {
+              return false;
+            }
+          }
+          
+          if(doc.caret.range.isRange) {
+            let currentline = doc.caret.range.chars[0].line;
+            let lastindex = doc.caret.range.chars[doc.caret.range.chars.length - 1].line.getIndex();
+            while(currentline && currentline.getIndex() <= lastindex) {
+              if(unTabLine(currentline)) {
+                if(currentline == doc.caret.line) {
+                  doc.caret.index = Math.max(0, doc.caret.index - doc.tab.length);
+                } else if( currentline == doc.caret.range.anchor.line) {
+                  doc.caret.range.anchor.index = Math.max(0, doc.caret.range.anchor.index - doc.tab.length);
+                }
+              }
+              currentline = currentline.getNextLine();
+            }
+            doc.caret.setSelect(doc.caret.line, doc.caret.index, true);
+          } else {
+            if(unTabLine(doc.caret.line)) {
+              doc.caret.setSelect(doc.caret.line, Math.max(0, doc.caret.index - doc.tab.length));
+            }
+          }
+        }
+    },
     'CTRLSHIFT': {},
     'NONE': {
       'ArrowUp':
@@ -93,8 +125,20 @@ var KEYBINDINGS = {
         },
       'Tab':
         function(e) {
-          doc.deleteSelection();
-          doc.insertAtCaret(doc.tab);
+          if(doc.caret.range.isRange) {
+            let currentline = doc.caret.range.chars[0].line;
+            let lastindex = doc.caret.range.chars[doc.caret.range.chars.length - 1].line.getIndex();
+            while(currentline && currentline.getIndex() <= lastindex) {
+              currentline.setText(doc.tab + currentline.getText());
+              currentline = currentline.getNextLine();
+            }
+            // re-create selection
+            doc.caret.range.anchor.index += doc.tab.length;
+            doc.caret.setSelect(doc.caret.line, doc.caret.index + doc.tab.length, true);
+          } else {
+            doc.deleteSelection();
+            doc.insertAtCaret(doc.tab);
+          }
         },
       'DEFAULT':
         function(e) {
