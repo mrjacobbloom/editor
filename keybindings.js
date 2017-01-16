@@ -24,7 +24,7 @@ var KEYBINDINGS = {
               doc.caret.setSelect(prev, doc.caret.column, e.shiftKey);
             }
           } else {
-            doc.caret.setSelect(doc.caret.line, 0);
+            doc.caret.setSelect(doc.caret.line, 0, e.shiftKey);
             doc.caret.column = doc.caret.index;
           }
         },
@@ -38,7 +38,7 @@ var KEYBINDINGS = {
               doc.caret.setSelect(next, doc.caret.column, e.shiftKey);
             }
           } else {
-            doc.caret.setSelect(doc.caret.line, doc.caret.line.getLength());
+            doc.caret.setSelect(doc.caret.line, doc.caret.line.getLength(), e.shiftKey);
             doc.caret.column = doc.caret.index;
           }
         },
