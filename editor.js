@@ -182,9 +182,21 @@ function Caret(doc, isAnchor) {
       }
       caret.range.start = start;
       caret.range.chars = [];
-      var step = start.getNextChar();
-      if (!step) {
-        step = start.line.getNextLine().chars[0];
+      
+      if(start.getNextChar()) {
+        step = start.getNextChar();
+      } else {
+        let currentline = start.line;
+        do {
+          if(currentline && currentline.getNextLine) {
+            currentline = currentline.getNextLine();
+          }
+          if(currentline) {
+            step = currentline.chars[0];
+          } else {
+            break;
+          }
+        } while (currentline && !currentline.chars[0]);
       }
       while(end.prettyPos() != step.prettyPos()
         && step.line.getIndex() <= end.line.getIndex()) {
@@ -193,11 +205,18 @@ function Caret(doc, isAnchor) {
         if(step.getNextChar && step.getNextChar()) {
           step = step.getNextChar();
         } else {
-          if(step.line.getNextLine()) {
-            step = step.line.getNextLine().chars[0];
-          } else {
-            break;
-          }
+          let currentline = step.line;
+          do {
+            if(currentline && currentline.getNextLine) {
+              currentline = currentline.getNextLine();
+            }
+            if(currentline) {
+              step = currentline.chars[0];
+            } else {
+              step = false;
+            }
+          } while (currentline && !currentline.chars[0]);
+          if(!step) break;
         }
       }
     } else {
