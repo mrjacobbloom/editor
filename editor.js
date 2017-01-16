@@ -38,6 +38,7 @@ function Char(doc, line, char, index) {
   
   var self = this;
   this.element.addEventListener('mousedown', function(e) {
+    if(doc.command) return;
     doc.dragging = true;
     if(e.clientX > self.element.getBoundingClientRect().left + (self.element.offsetWidth/2)) {
       doc.caret.setSelect(self.line, self.getIndex() + 1);
@@ -47,6 +48,7 @@ function Char(doc, line, char, index) {
     doc.caret.column = doc.caret.index;
   });
   this.element.addEventListener('mousemove', function(e) {
+    if(doc.command) return;
     if(doc.dragging) {
       if(e.clientX > self.element.getBoundingClientRect().left + (self.element.offsetWidth/2)) {
         doc.caret.setSelect(self.line, self.getIndex() + 1, true);
@@ -108,6 +110,7 @@ function Line(doc, text, index) {
     return this.chars.length;
   }
   this.element.addEventListener('mousedown', function(e) {
+    if(doc.command) return;
     doc.dragging = true;
     if(e.target == line.element || e.target == line.contentelement) {
       doc.caret.setSelect(line, line.getLength());
@@ -258,6 +261,7 @@ function Document(text) {
   this.tab = '    ';
   this.dragging = false;
   this.editor = document.querySelector('#editor');
+  this.command = false;
   
   //this.caret = null;
   this.caret = new Caret(doc);

@@ -99,18 +99,24 @@ body {
 }
 .caret-blinker {
   animation: 1s caret infinite step-end;
+  background: #ddd;
   height: 1em;
   width: 1px;
 }
 
+.command .caret-blinker {
+  background: #999;
+  animation: none;
+}
+
 @keyframes caret {
   0% {
-    background: #ddd;
+    opacity: 1;
   }
   50% {
-    background: transparent;
+    opacity: 0;
   }
   100% {
-    background: transparent;
+    opacity: 0;
   }
 }

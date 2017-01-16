@@ -1,8 +1,19 @@
 (function() {
 var doc = window.editor;
 var KEYBINDINGS = {
-  'EDIT': {},
-  'NEDIT': {
+  'CMND': {
+    'CTRL': {},
+    'SHIFT': {
+      'Space':
+        function(e) {
+          doc.command = false;
+          doc.editor.classList.remove('command');
+        },
+    },
+    'CTRLSHIFT': {},
+    'NONE': {}
+  },
+  'NCMND': {
     'CTRL': {
       'KeyA':
         function(e) {
@@ -42,7 +53,12 @@ var KEYBINDINGS = {
               doc.caret.setSelect(doc.caret.line, Math.max(0, doc.caret.index - doc.tab.length));
             }
           }
-        }
+        },
+        'Space':
+          function(e) {
+            doc.command = true;
+            doc.editor.classList.add('command');
+          },
     },
     'CTRLSHIFT': {},
     'NONE': {
@@ -154,21 +170,21 @@ var KEYBINDINGS = {
 document.body.addEventListener('keydown', function(e) {
   console.log(e);
   var func = false;
-  var edit = 'NEDIT';
+  var cmnd = (doc.command ? 'CMND' : 'NCMND');
   if(e.metaKey || e.ctrlKey) {
     func =
-        ((e.shiftKey) ? KEYBINDINGS[edit]['CTRLSHIFT'][e.code] : false)
-        || KEYBINDINGS[edit]['CTRL'][e.code]
+        ((e.shiftKey) ? KEYBINDINGS[cmnd]['CTRLSHIFT'][e.code] : false)
+        || KEYBINDINGS[cmnd]['CTRL'][e.code]
         || false;
   } else {
     func = 
-        ((e.shiftKey) ? KEYBINDINGS[edit]['SHIFT'][e.code] : false)
-        || KEYBINDINGS[edit]['NONE'][e.code]
-        || KEYBINDINGS[edit]['NONE']['DEFAULT'];
+        ((e.shiftKey) ? KEYBINDINGS[cmnd]['SHIFT'][e.code] : false)
+        || KEYBINDINGS[cmnd]['NONE'][e.code]
+        || KEYBINDINGS[cmnd]['NONE']['DEFAULT'];
   }
+  console.log([cmnd, func ? func.name: false])
   if(func) {
     func(e);
-    console.log(func.name)
     e.preventDefault();
     return false;
   } else {
