@@ -17,7 +17,11 @@ var KEYBINDINGS = {
         },
       'Backspace':
         function(e) {
-          doc.commandinput.innerHTML = doc.commandinput.innerHTML.substring(0, doc.commandinput.innerHTML.length - 1);
+          if(doc.commandinput.innerHTML.length) {
+            doc.commandinput.innerHTML = doc.commandinput.innerHTML.substring(0, doc.commandinput.innerHTML.length - 1);
+          } else {
+            doc.setCommand(false);
+          }
         },
       'Enter':
         function(e) {
