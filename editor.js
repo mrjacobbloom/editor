@@ -262,6 +262,16 @@ function Document(text) {
   this.dragging = false;
   this.editor = document.querySelector('#editor');
   this.command = false;
+  this.setCommand = function(command) {
+    if(command) {
+      this.command = true;
+      doc.editor.classList.add('command');
+    } else {
+      this.command = false;
+      doc.editor.classList.remove('command');
+    }
+  }
+  this.commandinput = editor.querySelector('#commandinput');
   
   //this.caret = null;
   this.caret = new Caret(doc);

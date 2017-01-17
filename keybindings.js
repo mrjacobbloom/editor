@@ -6,12 +6,26 @@ var KEYBINDINGS = {
     'SHIFT': {
       'Space':
         function(e) {
-          doc.command = false;
-          doc.editor.classList.remove('command');
+          doc.setCommand(false);
         },
     },
     'CTRLSHIFT': {},
-    'NONE': {}
+    'NONE': {
+      'Escape':
+        function(e) {
+          doc.setCommand(false);
+        },
+      'Backspace':
+        function(e) {
+          doc.commandinput.innerHTML = doc.commandinput.innerHTML.substring(0, doc.commandinput.innerHTML.length - 1);
+        },
+      'DEFAULT':
+        function(e) {
+          if(e.key.length == 1) {
+            doc.commandinput.innerHTML += e.key;
+          }
+        },
+    }
   },
   'NCMND': {
     'CTRL': {
@@ -56,11 +70,15 @@ var KEYBINDINGS = {
         },
         'Space':
           function(e) {
-            doc.command = true;
-            doc.editor.classList.add('command');
+            doc.setCommand(true);
           },
     },
-    'CTRLSHIFT': {},
+    'CTRLSHIFT': {
+      'KeyA':
+        function(e) {
+          doc.caret.setSelect(doc.caret.line, doc.caret.index);
+        },
+    },
     'NONE': {
       'ArrowUp':
         function(e) {

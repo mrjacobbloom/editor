@@ -56,6 +56,7 @@ body {
   -moz-user-select: none; /* Firefox */
   -ms-user-select: none; /* Internet Explorer/Edge */
   user-select: none;
+  position: relative;
 }
 .line {
   outline: none;
@@ -104,7 +105,7 @@ body {
   width: 1px;
 }
 
-.command .caret-blinker {
+#editor.command .caret-blinker {
   background: #999;
   animation: none;
 }
@@ -119,4 +120,37 @@ body {
   100% {
     opacity: 0;
   }
+}
+
+#commandcontainer {
+  visibility: hidden;
+  opacity: 0;
+  transition: .2s opacity, 0s .2s visibility;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: rgba(40,40,40,.5);
+  text-align: center;
+}
+
+#editor.command #commandcontainer {
+  visibility: visible;
+  opacity: 1;
+  transition: .2s opacity;
+}
+
+#commandinput {
+  display: inline-block;
+  margin-top: 150px;
+  border: 1px solid rgba(134, 134, 204, 0.6);
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 20pt;
+  background: rgba(100,100,100,.5);
+  box-shadow: 0 0 5px 0px rgba(134, 134, 204, 0.6) inset;
+  color: rgba(134, 134, 204, 0.8);
+  height: 1em;
+  white-space: pre;
 }
