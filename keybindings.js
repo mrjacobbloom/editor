@@ -144,8 +144,8 @@ var KEYBINDINGS = {
               }
               let oldprevlength = prev.getLength();
               prev.setText(prev.getText() + doc.caret.line.getText());
-              doc.caret.setSelect(prev, oldprevlength);
               doc.caret.line.remove();
+              doc.caret.setSelect(prev, oldprevlength);
             } else {
               var index = doc.caret.index;
               doc.caret.getPreviousChar().remove();
