@@ -19,6 +19,11 @@ var KEYBINDINGS = {
         function(e) {
           doc.commandinput.innerHTML = doc.commandinput.innerHTML.substring(0, doc.commandinput.innerHTML.length - 1);
         },
+      'Enter':
+        function(e) {
+          doc.commandinput.innerHTML = 'RUNNING "' + doc.commandinput.innerHTML + '"';
+          setTimeout(function() {doc.setCommand(false);}, 500)
+        },
       'DEFAULT':
         function(e) {
           if(e.key.length == 1) {
