@@ -5,13 +5,16 @@
 </head>
 <body>
   <div id="heading">
-    <div id="settings">
-      <div id="cogbutton">&#9881;</div>
-      <div id="settingspanel">
-        <input type="checkbox" id="settings-autocorrect" name="settings-autocorrect"/> <label for="settings-autocorrect">autocorrect</label>
-      </div>
+    <div id="titlewrapper">
+      <input type="text" class="title" id="title-disabled" disabled value="default.txt">
+      <input type="text" class="title" id="title" value="default">
     </div>
-    <h1>editor</h1>
+    <div id="buttons">
+      <div id="filemenu">
+        <div class="button"><img src="icons/folder.svg"/></div>
+      </div>
+      <div class="button"><img src="icons/rubbish.svg"/></div>
+    </div>
   </div>
   <div id="editor">
     <div id="commandcontainer">
@@ -19,6 +22,7 @@
     </div>
   </div>
   <script src="editor.js"></script>
+  <script src="files.js"></script>
   <script src="keybindings.js"></script>
 </body>
 </html>

@@ -195,6 +195,7 @@ var KEYBINDINGS = {
 };
 
 document.body.addEventListener('keydown', function(e) {
+  if(document.activeElement == title) return true;
   console.log(e);
   var func = false;
   var cmnd = (doc.command ? 'CMND' : 'NCMND');
@@ -212,6 +213,7 @@ document.body.addEventListener('keydown', function(e) {
   console.log([cmnd, func ? func.name: false])
   if(func) {
     func(e);
+    doc.fileSystem.saveTimer.reset()
     e.preventDefault();
     return false;
   } else {

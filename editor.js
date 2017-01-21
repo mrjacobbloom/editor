@@ -1,8 +1,3 @@
-document.querySelector('#cogbutton').addEventListener('click', function() {
-  document.querySelector('#settingspanel').classList.toggle('show');
-});
-// also on blur, or on document.body when target isn't in the settingspanel
-
 function Char(doc, line, char, index) {
   this.char = char;
   this.toString = function() {
@@ -243,7 +238,7 @@ function Caret(doc, isAnchor) {
   }
 }
 
-function Document(text) {
+function Editor(text) {
   this.lines = [];
   
   this.style = document.createElement('style');
@@ -277,15 +272,22 @@ function Document(text) {
   //this.caret = null;
   this.caret = new Caret(doc);
   
-  if(text === undefined) text = '';
-  var split = text.split('\n');
-  for(let i = 0; i < split.length; i++) {
-    new Line(this, split[i]);
+  this.setText = function(text) {
+    while(this.lines.length) {
+      this.lines[0].remove();
+    }
+    
+    if(text === undefined) text = '';
+    var split = text.split('\n');
+    for(let i = 0; i < split.length; i++) {
+      new Line(this, split[i]);
+    }
+    
+    var lastLine = this.lines[this.lines.length - 1]
+    this.caret.setSelect(lastLine, lastLine.getLength());
+    this.caret.column = lastLine.getLength();
   }
-  
-  var lastLine = this.lines[this.lines.length - 1]
-  this.caret.setSelect(lastLine, lastLine.getLength());
-  this.caret.column = lastLine.getLength();
+  this.setText(text);
   
   this.deleteSelection = function() {
     if(!doc.caret.range.isRange) return;
@@ -337,7 +339,12 @@ function Document(text) {
         doc.insertAtCaret(data);
     }
     e.preventDefault();
+    doc.fileSystem.saveTimer.reset()
   });
+  
+  this.getDocumentAsPlainText = function() {
+    return doc.lines.join('\n');
+  }
   
   this.getSelectionAsPlainText = function() {
     if(!doc.caret.range.isRange) return '';
@@ -367,9 +374,5 @@ function Document(text) {
 
 // Initialize
 (function() {
-  window.editor = new Document(`document.addEventListener('copy', function(e){
-    e.clipboardData.setData('text/plain', 'Hello, world!');
-    e.clipboardData.setData('text/html', '<b>Hello, world!</b>');
-    e.preventDefault(); // We want our data, not data from any selection, to be written to the clipboard
-});`);
+  window.editor = new Editor();
 })();

@@ -5,42 +5,64 @@ body {
 }
 #heading {
   flex: 0 0 auto;
-  padding: 20px 0;
+  padding: 10px 0;
+  height: calc( 20pt + ( 2 * 13px ) );
 }
-#heading #settings {
-  display: inline-block;
-  float: right;
-  max-height: 20px;
-  display: none;
-}
-#heading #settingspanel {
-  border: 1px solid #ddd;
-  padding: 10px;
-  z-index: 4;
+
+#titlewrapper {
   position: relative;
-  background: #333;
+  height: calc( 20pt + ( 2 * 13px ) );
+  width: 350px;
+  display: inline-block;
+}
+
+#heading input.title {
   color: #ddd;
   font-family: sans-serif;
   font-weight: lighter;
-  display: none;
-}
-#heading #settingspanel.show {
-  display: block;
-}
-#heading #cogbutton {
-  color: ddd;
-  font-size: 20px;
-  cursor: default;
-  text-align: right;
-}
-#heading h1 {
-  color: ddd;
-  font-family: sans-serif;
-  font-weight: lighter;
-  padding: 0;
   margin: 0;
-  line-height: 50%;
+  font-size: 20pt;
+  background: transparent;
+  border: 1px solid #333;
+  padding: 10px;
+  position: absolute;
+  box-sizing: border-box;
+  height: inherit;
+  width: 350px;
 }
+
+#titlewrapper:hover #title-disabled {
+  background: #333;
+}
+
+#heading input#title-disabled {
+  color: #999;
+}
+
+#buttons {
+  display: inline-block;
+  height: inherit;
+}
+
+#filemenu {
+  display: inline-block;
+}
+
+.button {
+  background: #999;
+  padding: 7px;
+  display: inline-block;
+  border-radius: 100%;
+  margin-left: 10px;
+}
+.button:hover {
+  background: #ddd;
+}
+
+.button > img {
+  width: 25px;
+}
+
 #editor {
   flex: 1 0 auto;
   display: flex;
