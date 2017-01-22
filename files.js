@@ -91,6 +91,7 @@ function FileSystem(doc) {
         li.appendChild(ext);
         menu.appendChild(li);
         li.addEventListener('click', function(e) {
+          fs.save();
           fs.open(fs.docsData[i]);
           file.classList.remove('open');
         });
