@@ -6,6 +6,8 @@ var doc = window.editor;
 
 function FileSystem(doc) {
   
+  var savestatus = document.querySelector('#savestatus');
+  
   var dataString = localStorage.getItem('docsData');
   if(dataString) {
     this.docsData = JSON.parse(dataString);
@@ -32,6 +34,8 @@ function FileSystem(doc) {
     } else {
       console.log('Document not saved to localStorage since nothing changed');
     }
+    var date = new Date();
+    savestatus.innerHTML = `Saved at ${(date.getHours() > 12 ? date.getHours() - 12 : date.getHours())}:${date.getMinutes()} ${(date.getHours() > 12) ? 'PM' : 'AM'}`;
     console.log(fs.docsData);
   }
   this.new = function(text) {
@@ -58,6 +62,7 @@ function FileSystem(doc) {
       if(fs.saveTimer.timer) fs.saveTimer.timer = clearTimeout(fs.saveTimer.timer);
       fs.saveTimer.timer = setTimeout(fs.save, fs.saveTimer.interval);
       console.log(`Save timer reset to ${fs.saveTimer.interval}ms`);
+      savestatus.innerHTML = 'Waiting to save';
     }
   }
   
