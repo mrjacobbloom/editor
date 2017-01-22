@@ -334,6 +334,7 @@ function Editor(text) {
   });
   
   document.body.addEventListener('paste', function(e) {
+    if(document.activeElement.getAttribute('id') == 'title') return true;
     if(e.clipboardData.types.indexOf('text/plain') > -1) {
         var data = e.clipboardData.getData('text/plain');
         doc.insertAtCaret(data);
