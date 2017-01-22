@@ -85,12 +85,19 @@ function FileSystem(doc) {
         let icon = document.createElement('img');
         icon.setAttribute('src', 'icons/file.svg')
         li.appendChild(icon);
-        li.appendChild(document.createTextNode(fs.docsData[i].title + fs.docsData[i].extension));
+        li.appendChild(document.createTextNode(fs.docsData[i].title));
+        let ext = document.createElement('span');
+        ext.appendChild(document.createTextNode(fs.docsData[i].extension));
+        li.appendChild(ext);
         menu.appendChild(li);
         li.addEventListener('click', function(e) {
           fs.open(fs.docsData[i]);
           file.classList.remove('open');
         });
+        
+        if(fs.docsData[i] == fs.openFile) {
+          li.classList.add('openFile');
+        }
       }
       
       let li = document.createElement('li');
