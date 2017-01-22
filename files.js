@@ -70,10 +70,19 @@ function FileSystem(doc) {
     }
   }
   
+  var scrollTitle = function() {
+    setTimeout(function() {
+      titleDisabled.scrollLeft = title.scrollLeft;
+    }, 0);
+  }
+  
   title.addEventListener('input', function(e) {
     titleDisabled.value = title.value + fs.openFile.extension;
     fs.save();
   });
+  title.addEventListener('keyup', scrollTitle);
+  title.addEventListener('scroll', scrollTitle);
+  title.addEventListener('mousewheel', scrollTitle);
   
   var file = document.querySelector('#file');
   file.querySelector('.button').addEventListener('click', function(e) {
