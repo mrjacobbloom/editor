@@ -35,7 +35,11 @@ function FileSystem(doc) {
       console.log('Document not saved to localStorage since nothing changed');
     }
     var date = new Date();
-    savestatus.innerHTML = `Saved at ${(date.getHours() > 12 ? date.getHours() - 12 : date.getHours())}:${date.getMinutes()} ${(date.getHours() > 12) ? 'PM' : 'AM'}`;
+    var hour = (((date.getHours() > 12 ? date.getHours() - 12 : date.getHours())) || 12).toString();
+    if(hour.length == 1) hour = '0' + hour;
+    var min = (date.getMinutes()).toString();
+    if(min.length == 1) min = '0' + min;
+    savestatus.innerHTML = `Saved at ${hour}:${min} ${(date.getHours() > 12) ? 'PM' : 'AM'}`;
     console.log(fs.docsData);
   }
   this.new = function(text) {
