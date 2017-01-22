@@ -87,7 +87,7 @@ function FileSystem(doc) {
         li.appendChild(icon);
         li.appendChild(document.createTextNode(fs.docsData[i].title));
         let ext = document.createElement('span');
-        ext.appendChild(document.createTextNode(fs.docsData[i].extension));
+        ext.appendChild(document.createTextNode(`${fs.docsData[i].extension} \u2014 ${fs.docsData[i].content.length} bytes`));
         li.appendChild(ext);
         menu.appendChild(li);
         li.addEventListener('click', function(e) {
