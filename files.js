@@ -112,6 +112,21 @@ function FileSystem(doc) {
       fs.new();
     }
   });
+  
+  document.querySelector('#download').addEventListener('click', function(e) {
+    // from http://stackoverflow.com/a/30832210
+    var  a = document.createElement("a"),
+      file = new Blob([doc.getDocumentAsPlainText()], {type: 'text/plain'}),
+       url = URL.createObjectURL(file);
+    a.href = url;
+    a.download = fs.openFile.title + fs.openFile.extension;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function() {
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);  
+    }, 0);
+  });
 }
 
 doc.fileSystem = new FileSystem(doc);
