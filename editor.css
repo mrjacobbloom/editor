@@ -41,12 +41,76 @@ body {
 
 #buttons {
   display: inline-block;
-  height: inherit;
+  position: relative;;
+  top: -10px;
 }
 
-#filemenu {
+.menubutton {
   display: inline-block;
 }
+.menuwrapper {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  position: absolute;
+  z-index: 4;
+  bottom: 0;
+  left: 0;
+}
+.menu {
+  background: #999;
+  border: 1px solid #999;
+  border-radius: 5px;
+  width: 200px;
+  padding: 0;
+  font-family: sans-serif;
+  color: #333;
+  display: none;
+  position: relative;
+}
+.menubutton.open .menu {
+  display: block;
+}
+.menu::before {
+  content: '';
+  background: inherit;
+  width: 8px;
+  height: 8px;
+  position: absolute;
+  border: inherit;
+  border-bottom: none;
+  border-right: none;
+  transform: rotate(45deg);
+  left: 20px;
+  top: calc( -8px * .707 );
+}
+.menu li {
+  padding: 7px;
+  list-style-type: none;
+  position: relative;
+}
+.menu li:not(:last-child)::after {
+  display: block;
+  content: '';
+  margin: 0 20px;
+  border-bottom: 1px solid #333;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+.menu li:hover::after {
+  display: none;
+}
+.menu li:hover {
+  background: #ddd;
+}
+.menu li img {
+  width: 15px;
+  margin-right: 5px;
+  vertical-align: middle;
+}
+
 
 .button {
   background: #999;
