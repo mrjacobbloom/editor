@@ -11,7 +11,6 @@ function FileSystem(doc) {
   var dataString = localStorage.getItem('docsData');
   if(dataString) {
     this.docsData = JSON.parse(dataString);
-    console.log(this.docsData)
   } else {
     this.docsData = [];
   }
@@ -40,7 +39,6 @@ function FileSystem(doc) {
     var min = (date.getMinutes()).toString();
     if(min.length == 1) min = '0' + min;
     savestatus.innerHTML = `Saved at ${hour}:${min} ${(date.getHours() > 12) ? 'PM' : 'AM'}`;
-    console.log(fs.docsData);
   }
   this.new = function(text) {
     var newfile = {
