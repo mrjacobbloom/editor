@@ -47,6 +47,7 @@ body {
 
 .menubutton {
   display: inline-block;
+  position: relative;
 }
 .menuwrapper {
   display: inline-block;
@@ -81,7 +82,7 @@ body {
   border-bottom: none;
   border-right: none;
   transform: rotate(45deg);
-  left: 20px;
+  left: 23px;
   top: calc( -8px * .707 );
 }
 .menu li {
