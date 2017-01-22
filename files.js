@@ -61,10 +61,9 @@ function FileSystem(doc) {
     }
   }
   
-  
   title.addEventListener('input', function(e) {
-    titleDisabled.value = title.value + this.openFile.extension;
-    fs.saveTimer.save();
+    titleDisabled.value = title.value + fs.openFile.extension;
+    fs.save();
   });
   
   var file = document.querySelector('#file');
